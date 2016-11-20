@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" prefer="system">
+    <system systemId="file:/C:/Users/mtkx/WebServicesProjects/LameDuck/build/web/WEB-INF/wsdl/fastmoney.imm.dtu.dk_8080/BankService.wsdl" uri="src/conf/xml-resources/web-services/NewWebServiceFromWSDL/wsdl/BankService.wsdl"/>
+    <nextCatalog catalog="nbproject/private/retriever/catalog.xml"/>
+    <system systemId="http://fastmoney.imm.dtu.dk:8080/BankService?wsdl" uri="src/conf/xml-resources/web-services/BankServiceFromWSDL/wsdl/fastmoney.imm.dtu.dk_8080/BankService.wsdl"/>
+    <system systemId="http://fastmoney.imm.dtu.dk:8080/BankService?wsdl=1" uri="src/conf/xml-resources/web-services/BankServiceFromWSDL/wsdl/fastmoney.imm.dtu.dk_8080/BankService.wsdl_1.wsdl"/>
+    <system systemId="http://fastmoney.imm.dtu.dk:8080/BankService?xsd=1" uri="src/conf/xml-resources/web-services/BankServiceFromWSDL/wsdl/fastmoney.imm.dtu.dk_8080/BankService.xsd_1.xsd"/>
+    <system systemId="http://fastmoney.imm.dtu.dk:8080/BankService?xsd=2" uri="src/conf/xml-resources/web-services/BankServiceFromWSDL/wsdl/fastmoney.imm.dtu.dk_8080/BankService.xsd_2.xsd"/>
+</catalog>
