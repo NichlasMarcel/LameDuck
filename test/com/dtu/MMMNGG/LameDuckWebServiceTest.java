@@ -5,7 +5,7 @@
  */
 package com.dtu.MMMNGG;
 
-import dk.dtu.imm.fastmoney.types.CreditCardInfoType;
+import Fastmoney.CreditCardInfoType;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;

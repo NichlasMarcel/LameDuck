@@ -5,14 +5,14 @@
  */
 package com.dtu.MMMNGG;
 
+import Fastmoney.AccountType;
+import Fastmoney.BankPortType;
+import Fastmoney.BankService;
+import Fastmoney.CreditCardFaultMessage;
+import Fastmoney.CreditCardInfoType;
 import javax.jws.WebService;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
-import dk.dtu.imm.fastmoney.BankService;
-import dk.dtu.imm.fastmoney.CreditCardFaultMessage;
-import dk.dtu.imm.fastmoney.types.CreditCardInfoType;
-import dk.dtu.imm.fastmoney.types.CreditCardInfoType.ExpirationDate;
-import dk.dtu.imm.fastmoney.types.AccountType;
 import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Random;
+import javax.xml.ws.WebServiceRef;
 
 /**
  *
@@ -27,6 +28,8 @@ import java.util.Random;
  */
 @WebService(serviceName = "MainWebService")
 public class LameDuckWebService {
+    @WebServiceRef(wsdlLocation = "WEB-INF/wsdl/fastmoney.imm.dtu.dk_8080/BankService.wsdl")
+    private BankService service;
 
     int groupNumber = 23;
     ArrayList<FlightInfoObject> listOfFO = new ArrayList<>();
@@ -37,11 +40,11 @@ public class LameDuckWebService {
     ArrayList<Integer> costForFlight = new ArrayList<>(Arrays.asList(150, 225, 275, 540, 780, 1087, 1320, 1580, 1725));
     Random random = new Random();
     int millisInDay = 24*60*60*1000;
-    BankService service = new BankService();
 
     
     public LameDuckWebService() throws ParseException {
         generateData();
+        service = new BankService();
     }
     
     private void generateData() throws ParseException {
@@ -106,7 +109,7 @@ public class LameDuckWebService {
     }
     
     @WebMethod(operationName = "bookFlights")
-    public boolean bookFlights(@WebParam(name = "bookingNumber") String bookingNumber, @WebParam(name = "creditCard") dk.dtu.imm.fastmoney.types.CreditCardInfoType creditCardInfo) throws CreditCardFaultMessage {
+    public boolean bookFlights(@WebParam(name = "bookingNumber") String bookingNumber, @WebParam(name = "creditCard") CreditCardInfoType creditCardInfo) throws CreditCardFaultMessage {
         
         boolean flightExist = false;
         
@@ -127,9 +130,7 @@ public class LameDuckWebService {
         //If the booking number exist, validate creditcard
         if(flightExist == true) {
             
-            BankServiceFromWSDL bs = new BankServiceFromWSDL();
-            
-            boolean isCCvalid = bs.validateCreditCard(groupNumber, creditCardInfo, tmpfio.getPrice());
+            boolean isCCvalid = validateCreditCard(groupNumber, creditCardInfo, tmpfio.getPrice());
             
             //Credit card is valid
             if (isCCvalid == true) {
@@ -138,11 +139,11 @@ public class LameDuckWebService {
                 account.setName("LameDuck");
                 account.setNumber("50208812");
                 
-                return bs.chargeCreditCard(groupNumber, creditCardInfo, tmpfio.getPrice(), account);
+                return chargeCreditCard(groupNumber, creditCardInfo, tmpfio.getPrice(), account);
             }
             //Credit card is invalid or does not have enough money
             else {
-                return bs.validateCreditCard(groupNumber, creditCardInfo, tmpfio.getPrice());
+                return validateCreditCard(groupNumber, creditCardInfo, tmpfio.getPrice());
             }
             
 
@@ -156,17 +157,14 @@ public class LameDuckWebService {
     }
     
     @WebMethod(operationName = "cancelFlights")
-    public boolean cancelFlights(@WebParam(name = "bookingnumber") String bookingnumber,@WebParam(name = "amount") int amount, @WebParam(name = "creditCard") dk.dtu.imm.fastmoney.types.CreditCardInfoType creditCardInfo) throws CreditCardFaultMessage {
-        
-        BankServiceFromWSDL bs = new BankServiceFromWSDL();
-        
+    public boolean cancelFlights(@WebParam(name = "bookingnumber") String bookingnumber,@WebParam(name = "amount") int amount, @WebParam(name = "creditCard") CreditCardInfoType creditCardInfo) throws CreditCardFaultMessage {
         int amountToRefund = amount / 2;
         
         AccountType account = new AccountType();        
         account.setName("LameDuck");
         account.setNumber("50208812");
         
-        return bs.refundCreditCard(groupNumber, creditCardInfo, amountToRefund, account);
+        return refundCreditCard(groupNumber, creditCardInfo, amountToRefund, account);
     }
     
     @WebMethod(operationName = "hello")
@@ -217,4 +215,25 @@ public class LameDuckWebService {
         return bookingNumber;
 
     }*/
+
+    private boolean chargeCreditCard(int group, Fastmoney.CreditCardInfoType creditCardInfo, int amount, Fastmoney.AccountType account) throws CreditCardFaultMessage {
+        // Note that the injected javax.xml.ws.Service reference as well as port objects are not thread safe.
+        // If the calling of port operations may lead to race condition some synchronization is required.
+        Fastmoney.BankPortType port = service.getBankPort();
+        return port.chargeCreditCard(group, creditCardInfo, amount, account);
+    }
+
+    private boolean refundCreditCard(int group, Fastmoney.CreditCardInfoType creditCardInfo, int amount, Fastmoney.AccountType account) throws CreditCardFaultMessage {
+        // Note that the injected javax.xml.ws.Service reference as well as port objects are not thread safe.
+        // If the calling of port operations may lead to race condition some synchronization is required.
+        Fastmoney.BankPortType port = service.getBankPort();
+        return port.refundCreditCard(group, creditCardInfo, amount, account);
+    }
+
+    private boolean validateCreditCard(int group, Fastmoney.CreditCardInfoType creditCardInfo, int amount) throws CreditCardFaultMessage {
+        // Note that the injected javax.xml.ws.Service reference as well as port objects are not thread safe.
+        // If the calling of port operations may lead to race condition some synchronization is required.
+        Fastmoney.BankPortType port = service.getBankPort();
+        return port.validateCreditCard(group, creditCardInfo, amount);
+    }
 }
