@@ -7,10 +7,12 @@ package com.dtu.MMMNGG;
 
 import java.util.Date;
 
+
 /**
  *
  * @author mtkx
  */
+
 public class FlightInfoObject {
     
     private String bookingNumber;

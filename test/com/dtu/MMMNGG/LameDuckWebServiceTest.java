@@ -55,8 +55,8 @@ public class LameDuckWebServiceTest {
         LameDuckWebService instance = new LameDuckWebService();
         //ArrayList<FlightInfoObject> expResult = null;
         int expResult = 2;
-        ArrayList<FlightInfoObject> result = instance.getFlights(fromDestination, toDestination, travelDate);
-        assertEquals(expResult, result.size());
+        FlightInfoObjectWrapper result = instance.getFlights(fromDestination, toDestination, travelDate);
+        assertEquals(expResult, result.list.size());
         // TODO review the generated test code and remove the default call to fail.
         //fail("The test case is a prototype.");
     }
@@ -148,16 +148,6 @@ public class LameDuckWebServiceTest {
     /**
      * Test of hello method, of class LameDuckWebService.
      */
-    @Test
-    public void testHello() throws Exception {
-        System.out.println("hello");
-        String txt = "Test";
-        LameDuckWebService instance = new LameDuckWebService();
-        String expResult = "Hello Test !";
-        String result = instance.hello(txt);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        //fail("The test case is a prototype.");
-    }
+    
     
 }

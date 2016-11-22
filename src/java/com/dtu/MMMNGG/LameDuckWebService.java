@@ -19,6 +19,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 import javax.xml.ws.WebServiceRef;
 
@@ -40,7 +41,8 @@ public class LameDuckWebService {
     ArrayList<Integer> costForFlight = new ArrayList<>(Arrays.asList(150, 225, 275, 540, 780, 1087, 1320, 1580, 1725));
     Random random = new Random();
     int millisInDay = 24*60*60*1000;
-
+    
+    ArrayList<FlightInfoObject> booked_flights = new ArrayList<FlightInfoObject>();
     
     public LameDuckWebService() throws ParseException {
         generateData();
@@ -72,7 +74,7 @@ public class LameDuckWebService {
     }
     
     @WebMethod(operationName = "getFlights")
-    public ArrayList<FlightInfoObject> getFlights(@WebParam(name = "from") String fromDestination, @WebParam(name = "toDestination") String toDestination, Date travelDate) {
+    public FlightInfoObjectWrapper getFlights(@WebParam(name = "from") String fromDestination, @WebParam(name = "toDestination") String toDestination, Date travelDate) {
         
         boolean flightsExistForDate = false;
         
@@ -85,27 +87,9 @@ public class LameDuckWebService {
                 flightCollection.add(listOfFO.get(i));
                 flightsExistForDate = true;
             }
-        }
+        }       
         
-        /*if (flightsExistForDate == false) {
-            Random randomGenerator = new Random();
-            //Generate a number within range 0-9
-            int randomInt = randomGenerator.nextInt(10);
-            
-            if(randomInt == 0) {
-                //No flights exist, and we don't create any. 10% chance of this happening.
-            }
-            else {
-                FlightInfoObject tmpfio = generateNewFlightInfoObject(fromDestination, toDestination, travelDate);
-                
-                //Add to generel list
-                listOfFO.add(tmpfio);
-                //Add to returned list
-                flightCollection.add(tmpfio);
-            }
-        }*/
-        
-        return flightCollection;
+        return new FlightInfoObjectWrapper(flightCollection);
     }
     
     @WebMethod(operationName = "bookFlights")
@@ -133,17 +117,22 @@ public class LameDuckWebService {
             boolean isCCvalid = validateCreditCard(groupNumber, creditCardInfo, tmpfio.getPrice());
             
             //Credit card is valid
-            if (isCCvalid == true) {
+            if (isCCvalid) {
                 
                 AccountType account = new AccountType();        
                 account.setName("LameDuck");
                 account.setNumber("50208812");
                 
-                return chargeCreditCard(groupNumber, creditCardInfo, tmpfio.getPrice(), account);
+                if(chargeCreditCard(groupNumber, creditCardInfo, tmpfio.getPrice(), account)){
+                    booked_flights.add(tmpfio);
+                    return true;
+                }
+                
+                return false;
             }
             //Credit card is invalid or does not have enough money
             else {
-                return validateCreditCard(groupNumber, creditCardInfo, tmpfio.getPrice());
+                return false;
             }
             
 
@@ -163,13 +152,24 @@ public class LameDuckWebService {
         AccountType account = new AccountType();        
         account.setName("LameDuck");
         account.setNumber("50208812");
-        
-        return refundCreditCard(groupNumber, creditCardInfo, amountToRefund, account);
+             
+        for(FlightInfoObject bookFlight : booked_flights){
+            if(bookFlight.getBookingNumber().equals(bookingnumber))
+            {
+                if(refundCreditCard(groupNumber, creditCardInfo, amountToRefund, account)){
+                    booked_flights.remove(bookFlight);
+                    return true;
+                }
+                return false;
+            }
+        }
+        return false;
     }
     
-    @WebMethod(operationName = "hello")
-    public String hello(@WebParam(name = "name") String txt) {
-        return "Hello " + txt + " !";
+    
+    @WebMethod(operationName = "WorkAround")
+    public FlightInfoObject test(@WebParam(name = "flight") FlightInfoObject flight) throws CreditCardFaultMessage {
+        return  flight;
     }
     
     /*private FlightInfoObject generateNewFlightInfoObject(String from, String to, Date date) {
