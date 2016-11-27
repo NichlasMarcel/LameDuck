@@ -74,7 +74,7 @@ public class LameDuckWebService {
     }
     
     @WebMethod(operationName = "getFlights")
-    public FlightInfoObjectWrapper getFlights(@WebParam(name = "from") String fromDestination, @WebParam(name = "toDestination") String toDestination, Date travelDate) {
+    public ArrayList<FlightInfoObject> getFlights(@WebParam(name = "from") String fromDestination, @WebParam(name = "toDestination") String toDestination, Date travelDate) {
         
         boolean flightsExistForDate = false;
         
@@ -89,7 +89,7 @@ public class LameDuckWebService {
             }
         }       
         
-        return new FlightInfoObjectWrapper(flightCollection);
+        return flightCollection;
     }
     
     @WebMethod(operationName = "bookFlights")

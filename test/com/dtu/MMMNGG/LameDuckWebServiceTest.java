@@ -9,6 +9,7 @@ import Fastmoney.CreditCardInfoType;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -55,8 +56,8 @@ public class LameDuckWebServiceTest {
         LameDuckWebService instance = new LameDuckWebService();
         //ArrayList<FlightInfoObject> expResult = null;
         int expResult = 2;
-        FlightInfoObjectWrapper result = instance.getFlights(fromDestination, toDestination, travelDate);
-        assertEquals(expResult, result.list.size());
+        List<FlightInfoObject> result = instance.getFlights(fromDestination, toDestination, travelDate);
+        assertEquals(expResult, result.size());
         // TODO review the generated test code and remove the default call to fail.
         //fail("The test case is a prototype.");
     }
